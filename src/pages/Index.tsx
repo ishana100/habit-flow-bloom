@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { HabitProvider, useHabits } from '@/contexts/HabitContext';
+import { useHabits } from '@/contexts/HabitContext';
 import { HabitCard } from '@/components/HabitCard';
 import { MotivationalBanner } from '@/components/MotivationalBanner';
 import { Button } from '@/components/ui/button';
@@ -190,9 +189,7 @@ function DashboardContent() {
 const Index = () => {
   return (
     <ThemeProvider defaultTheme="light">
-      <HabitProvider>
-        <DashboardContent />
-      </HabitProvider>
+      <DashboardContent />
     </ThemeProvider>
   );
 };
