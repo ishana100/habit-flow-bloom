@@ -10,7 +10,10 @@ import HabitDetail from "./pages/HabitDetail";
 import EditHabit from "./pages/EditHabit";
 import SelectDays from "./pages/SelectDays";
 import NotFound from "./pages/NotFound";
-import React from "react"; // Add explicit React import
+import HabitFrequency from "./pages/HabitFrequency";
+import HabitTimeRange from "./pages/HabitTimeRange";
+import HabitReminder from "./pages/HabitReminder";
+import React from "react";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +29,9 @@ const App = () => (
             <Route path="/habit/:habitId" element={<HabitDetail />} />
             <Route path="/edit-habit/:habitId" element={<EditHabit />} />
             <Route path="/select-days/:habitId" element={<SelectDays />} />
+            <Route path="/habit/:habitId/frequency" element={<HabitFrequency />} />
+            <Route path="/habit/:habitId/time" element={<HabitTimeRange />} />
+            <Route path="/habit/:habitId/reminder" element={<HabitReminder />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </HabitProvider>

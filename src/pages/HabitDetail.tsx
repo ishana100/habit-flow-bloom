@@ -4,10 +4,10 @@ import { ArrowLeft, Clock, Trash2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
 import { useHabits } from '@/contexts/HabitContext';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { toast } from '@/hooks/use-toast';
 
 const HabitDetail = () => {
   const { habitId } = useParams();
@@ -29,6 +29,11 @@ const HabitDetail = () => {
 
   const handleDelete = () => {
     deleteHabit(habit.id);
+    toast({
+      title: "Habit deleted",
+      description: "Your habit has been deleted successfully",
+      variant: "destructive",
+    });
     navigate('/');
   };
 
@@ -59,9 +64,15 @@ const HabitDetail = () => {
                 <Button 
                   variant="ghost" 
                   className="flex items-center text-muted-foreground"
-                  onClick={() => navigate(`/edit-habit/${habit.id}/frequency`)}
+                  onClick={() => navigate(`/habit/${habit.id}/frequency`)}
                 >
-                  <span>Optional</span>
+                  <span>
+                    {habit.frequency === 'daily' ? 'Every day' : 
+                     habit.frequency === 'weekly' ? 'Once a week' : 
+                     habit.selectedDays?.length === 7 ? 'Every day' : 
+                     habit.selectedDays?.length === 0 ? 'No days selected' : 
+                     `${habit.selectedDays?.length} days a week`}
+                  </span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </Button>
               </div>
@@ -73,9 +84,9 @@ const HabitDetail = () => {
                 <Button 
                   variant="ghost" 
                   className="flex items-center text-muted-foreground"
-                  onClick={() => navigate(`/edit-habit/${habit.id}/time`)}
+                  onClick={() => navigate(`/habit/${habit.id}/time`)}
                 >
-                  <span>Optional</span>
+                  <span>{habit.timeRange || 'Anytime'}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </Button>
               </div>
@@ -87,7 +98,7 @@ const HabitDetail = () => {
                 <Button 
                   variant="ghost" 
                   className="flex items-center text-muted-foreground"
-                  onClick={() => navigate(`/edit-habit/${habit.id}/reminder`)}
+                  onClick={() => navigate(`/habit/${habit.id}/reminder`)}
                 >
                   <span>{habit.reminderTime || '9:00 AM'}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -107,7 +118,7 @@ const HabitDetail = () => {
         </Button>
 
         <div className="mt-8">
-          <h3 className="text-lg font-semibold mb-4">Best time to meditate is early morning</h3>
+          <h3 className="text-lg font-semibold mb-4">Best time to {habit.name.toLowerCase()} is early morning</h3>
           <div className="relative h-4 bg-gray-200 rounded-full overflow-hidden">
             <div 
               className={`absolute left-0 top-0 h-full bg-habit-${habit.color} rounded-full`}
