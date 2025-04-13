@@ -1,17 +1,21 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, MoreHorizontal, Trash2, Edit } from 'lucide-react';
-import { Habit } from '@/types/habit';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Habit } from '@/types/habit';
 import { useHabits } from '@/contexts/HabitContext';
+import { HabitCheckbox } from '@/components/HabitCheckbox';
+import { format } from 'date-fns';
+import { motion } from 'framer-motion';
 
 interface HabitCardProps {
   habit: Habit;
@@ -19,98 +23,98 @@ interface HabitCardProps {
 }
 
 export function HabitCard({ habit, onEdit }: HabitCardProps) {
-  const { toggleHabit, deleteHabit } = useHabits();
-  const [isAnimating, setIsAnimating] = useState(false);
   const navigate = useNavigate();
+  const { completeHabit, deleteHabit } = useHabits();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const today = format(new Date(), 'yyyy-MM-dd');
+  const isCompletedToday = habit.completionDates.some(date => date.startsWith(today));
 
-  const handleToggle = () => {
-    if (!habit.completed) {
-      setIsAnimating(true);
-      setTimeout(() => {
-        toggleHabit(habit.id);
-        setIsAnimating(false);
-      }, 400);
-    } else {
-      toggleHabit(habit.id);
+  const handleComplete = (completed: boolean) => {
+    completeHabit(habit.id, completed);
+    
+    if (completed) {
+      toast({
+        title: "Habit completed! 🎉",
+        description: `You've completed ${habit.name} for today!`,
+        duration: 3000,
+      });
     }
   };
 
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Check if the click was on the toggle button or dropdown
-    const target = e.target as HTMLElement;
-    if (target.closest('button')) return;
-    
-    // Otherwise navigate to habit detail
-    navigate(`/habit/${habit.id}`);
+  const handleDelete = () => {
+    deleteHabit(habit.id);
+    toast({
+      title: "Habit deleted",
+      description: `${habit.name} has been deleted`,
+      variant: "destructive",
+    });
   };
 
   return (
-    <Card 
-      className={cn(
-        `habit-card-shadow habit-card-hover p-4 relative overflow-hidden transition-all cursor-pointer`, 
-        `border-l-4 border-habit-${habit.color}`,
-        habit.completed && 'opacity-80'
-      )}
-      data-testid={`habit-card-${habit.id}`}
-      onClick={handleCardClick}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <Button
-            onClick={handleToggle}
-            variant="outline"
-            size="icon"
-            className={cn(
-              `w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center`,
-              `hover:bg-habit-${habit.color} hover:text-primary-foreground`,
-              habit.completed && `bg-habit-${habit.color} border-habit-${habit.color}`,
-              !habit.completed && `border-habit-${habit.color} text-primary`
-            )}
-            aria-label={`Mark ${habit.name} as ${habit.completed ? 'incomplete' : 'complete'}`}
-          >
-            {habit.completed && <Check className={cn("h-5 w-5", isAnimating && "animate-check-mark")} />}
-          </Button>
-          <div className="flex flex-col">
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl" aria-hidden="true">{habit.icon}</span>
+      <Card
+        className={`
+          p-3 habit-card-shadow habit-card-hover border-l-4 hover:border-l-4
+          ${isCompletedToday ? 'bg-muted/30' : 'bg-card'}
+        `}
+        style={{ borderLeftColor: `var(--habit-${habit.color})` }}
+      >
+        <div className="flex items-center">
+          <HabitCheckbox 
+            checked={isCompletedToday}
+            onCheckedChange={handleComplete}
+            color={habit.color}
+          />
+          
+          <div className="ml-3 flex-1 cursor-pointer" onClick={() => navigate(`/habit/${habit.id}`)}>
+            <div className="flex items-center">
+              <span className="text-xl mr-2">{habit.icon}</span>
               <h3 className="font-medium">{habit.name}</h3>
             </div>
-            <div className="text-xs text-muted-foreground mt-1">
-              {habit.frequency === 'daily' ? 'Every day' : 'Once a week'} • {habit.streak} day streak
+            
+            <div className="flex items-center mt-1">
+              <div className="text-xs text-muted-foreground">
+                {habit.frequency === 'daily' ? 'Every day' : 
+                 habit.frequency === 'weekly' ? 'Once a week' : 
+                 habit.selectedDays?.length === 7 ? 'Every day' : 
+                 habit.selectedDays?.length === 0 ? 'No days selected' : 
+                 `${habit.selectedDays?.length} days a week`}
+              </div>
+              
+              {habit.streak > 0 && (
+                <div className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full flex items-center">
+                  <span className="mr-1">🔥</span> {habit.streak} day{habit.streak !== 1 ? 's' : ''}
+                </div>
+              )}
             </div>
           </div>
+          
+          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => onEdit(habit)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onClick={handleDelete}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit(habit)}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem 
-              onClick={() => deleteHabit(habit.id)}
-              className="text-destructive focus:text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      
-      {/* Progress indicator */}
-      <div className="mt-3 bg-secondary h-1.5 rounded-full overflow-hidden">
-        <div 
-          className={`h-full rounded-full bg-habit-${habit.color}`} 
-          style={{ width: `${(habit.streak / Math.max(habit.longestStreak, 7)) * 100}%` }}
-        />
-      </div>
-    </Card>
+      </Card>
+    </motion.div>
   );
 }
