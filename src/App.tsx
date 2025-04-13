@@ -9,15 +9,16 @@ import HabitDetail from "./pages/HabitDetail";
 import EditHabit from "./pages/EditHabit";
 import SelectDays from "./pages/SelectDays";
 import NotFound from "./pages/NotFound";
+import React from "react"; // Add explicit React import
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+    <BrowserRouter>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/habit/:habitId" element={<HabitDetail />} />
@@ -25,8 +26,8 @@ const App = () => (
           <Route path="/select-days/:habitId" element={<SelectDays />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+      </TooltipProvider>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 
