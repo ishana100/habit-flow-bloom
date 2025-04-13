@@ -24,13 +24,13 @@ interface HabitCardProps {
 
 export function HabitCard({ habit, onEdit }: HabitCardProps) {
   const navigate = useNavigate();
-  const { completeHabit, deleteHabit } = useHabits();
+  const { toggleHabit, deleteHabit } = useHabits();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const today = format(new Date(), 'yyyy-MM-dd');
   const isCompletedToday = habit.completionDates.some(date => date.startsWith(today));
 
   const handleComplete = (completed: boolean) => {
-    completeHabit(habit.id, completed);
+    toggleHabit(habit.id);
     
     if (completed) {
       toast({
