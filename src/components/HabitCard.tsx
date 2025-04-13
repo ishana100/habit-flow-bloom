@@ -1,5 +1,5 @@
-
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Check, MoreHorizontal, Trash2, Edit } from 'lucide-react';
 import { Habit } from '@/types/habit';
 import { cn } from '@/lib/utils';
@@ -21,6 +21,7 @@ interface HabitCardProps {
 export function HabitCard({ habit, onEdit }: HabitCardProps) {
   const { toggleHabit, deleteHabit } = useHabits();
   const [isAnimating, setIsAnimating] = useState(false);
+  const navigate = useNavigate();
 
   const handleToggle = () => {
     if (!habit.completed) {
@@ -34,14 +35,24 @@ export function HabitCard({ habit, onEdit }: HabitCardProps) {
     }
   };
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Check if the click was on the toggle button or dropdown
+    const target = e.target as HTMLElement;
+    if (target.closest('button')) return;
+    
+    // Otherwise navigate to habit detail
+    navigate(`/habit/${habit.id}`);
+  };
+
   return (
     <Card 
       className={cn(
-        `habit-card-shadow habit-card-hover p-4 relative overflow-hidden transition-all`, 
+        `habit-card-shadow habit-card-hover p-4 relative overflow-hidden transition-all cursor-pointer`, 
         `border-l-4 border-habit-${habit.color}`,
         habit.completed && 'opacity-80'
       )}
       data-testid={`habit-card-${habit.id}`}
+      onClick={handleCardClick}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
