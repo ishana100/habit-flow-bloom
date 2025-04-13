@@ -7,7 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { useHabits } from '@/contexts/HabitContext';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Input } from '@/components/ui/input';
-import { HabitFormData } from '@/types/habit';
+import { HabitFormData, HabitColor } from '@/types/habit';
 
 const EditHabit = () => {
   const { habitId } = useParams();
@@ -49,6 +49,16 @@ const EditHabit = () => {
     }
   };
 
+  const colorOptions: { value: HabitColor; label: string }[] = [
+    { value: 'mint', label: 'Mint' },
+    { value: 'lavender', label: 'Lavender' },
+    { value: 'peach', label: 'Peach' },
+    { value: 'coral', label: 'Coral' },
+    { value: 'yellow', label: 'Yellow' },
+    { value: 'blue', label: 'Blue' },
+    { value: 'pink', label: 'Pink' },
+  ];
+
   return (
     <ThemeProvider defaultTheme="light">
       <div className="container max-w-md mx-auto p-4">
@@ -66,8 +76,34 @@ const EditHabit = () => {
         </header>
 
         <div className="flex flex-col items-center mb-6">
-          <div className="text-6xl mb-4">{habit.icon}</div>
+          <div 
+            className="text-6xl mb-4 p-5 rounded-full" 
+            style={{ backgroundColor: `var(--habit-${habit.color})` }}
+          >
+            {habit.icon}
+          </div>
           <h2 className="text-2xl font-bold">{habit.name}</h2>
+          
+          <div className="flex items-center mt-3 gap-2">
+            <span className="text-sm font-medium">Color:</span>
+            <div className="flex gap-2">
+              {colorOptions.map((color) => (
+                <button
+                  key={color.value}
+                  type="button"
+                  className={`h-6 w-6 rounded-full border ${
+                    habit.color === color.value ? 'ring-2 ring-primary ring-offset-1' : ''
+                  }`}
+                  style={{ backgroundColor: `var(--habit-${color.value})` }}
+                  onClick={() => {
+                    // This is just visual for now - to actually change it, you'd use the HabitForm
+                    // You would need to navigate to the full edit form
+                  }}
+                  aria-label={color.label}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -112,7 +148,14 @@ const EditHabit = () => {
           )}
 
           <Button 
-            className="w-full mt-8 py-3 bg-red-500 hover:bg-red-600 text-white"
+            className="w-full mt-8" 
+            onClick={handleSave}
+          >
+            Save Changes
+          </Button>
+
+          <Button 
+            className="w-full mt-4 py-3 bg-red-500 hover:bg-red-600 text-white"
             variant="destructive"
             onClick={() => navigate(`/habit/${habitId}`)}
           >

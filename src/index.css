@@ -34,6 +34,15 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 1rem;
+    
+    /* Habit Colors */
+    --habit-mint: #F2FCE2;
+    --habit-lavender: #E5DEFF;
+    --habit-peach: #FDE1D3;
+    --habit-coral: #FEC6A1;
+    --habit-yellow: #FEF7CD;
+    --habit-blue: #D3E4FD;
+    --habit-pink: #FFDEE2;
   }
 
   .dark {
@@ -64,6 +73,15 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+    
+    /* Habit Colors - slightly darker for dark mode */
+    --habit-mint: #D2ECB2;
+    --habit-lavender: #C5BEFF;
+    --habit-peach: #EDC1A3;
+    --habit-coral: #EEA681;
+    --habit-yellow: #EEE7AD;
+    --habit-blue: #B3D4FD;
+    --habit-pink: #EFCEC2;
   }
 }
 

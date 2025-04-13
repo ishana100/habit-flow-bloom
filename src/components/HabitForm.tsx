@@ -80,17 +80,22 @@ export function HabitForm({ onSubmit, onCancel, initialData }: HabitFormProps) {
 
         <div className="space-y-2">
           <Label htmlFor="habit-color">Color Theme</Label>
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-4 mt-2">
             {colorOptions.map((color) => (
-              <Button
-                key={color.value}
-                type="button"
-                variant="outline"
-                className={`h-12 w-12 rounded-full ${formData.color === color.value ? 'ring-2 ring-primary ring-offset-2' : ''}`}
-                style={{ backgroundColor: `var(--habit-${color.value})` }}
-                onClick={() => setFormData({ ...formData, color: color.value })}
-                aria-label={`Select ${color.label} color`}
-              />
+              <div key={color.value} className="flex flex-col items-center">
+                <button
+                  type="button"
+                  className={`h-12 w-12 rounded-full border-2 transition-all duration-200 ${
+                    formData.color === color.value 
+                      ? 'border-primary ring-2 ring-primary ring-offset-2' 
+                      : 'border-transparent hover:border-gray-300'
+                  }`}
+                  style={{ backgroundColor: `var(--habit-${color.value})` }}
+                  onClick={() => setFormData({ ...formData, color: color.value })}
+                  aria-label={`Select ${color.label} color`}
+                />
+                <span className="text-xs mt-1 text-muted-foreground">{color.label}</span>
+              </div>
             ))}
           </div>
         </div>
